@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>javascript实现瀑布流</title>
+    <style>
+        * {
+            padding: 0;
+            margin: 0;
+        }
+        
+        #main {
+            position: relative;
+        }
+        
+        .box {
+            padding: 15px 0 0 15px;
+            float: left;
+        }
+        
+        .pic {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-shadow: 0 0 5px #ccc;
+        }
+        
+        .pic img {
+            width: 165px;
+            height: auto;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="main">
+        <div class="box">
+            <div class="pic">
+                <img src="./images/P_00.jpg " alt="">
+            </div>
+        </div>
+        <div class="box">
+            <div class="pic">
+                <img src="./images/P_01.jpg " alt="">
+            </div>
+        </div>
+        <div class="box">
+            <div class="pic">
+                <img src="./images/P_02.jpg " alt="">
+            </div>
+        </div>
+        <div class="box">
+            <div class="pic">
+                <img src="./images/P_03.jpg " alt="">
+            </div>
+        </div>
+        <div class="box">
+            <div class="pic">
+                <img src="./images/P_04.jpg " alt="">
+            </div>
+        </div>
+        <div class="box">
+            <div class="pic">
+                <img src="./images/P_05.jpg " alt="">
+            </div>
+        </div>
+        <div class="box">
+            <div class="pic">
+                <img src="./images/P_06.jpg " alt="">
+            </div>
+        </div>
+        <div class="box">
+            <div class="pic">
+                <img src="./images/P_07.jpg " alt="">
+            </div>
+        </div>
+        <div class="box">
+            <div class="pic">
+                <img src="./images/P_08.jpg " alt="">
+            </div>
+        </div>
+        <div class="box">
+            <div class="pic">
+                <img src="./images/P_09.jpg " alt="">
+            </div>
+        </div>
+        <div class="box">
+            <div class="pic">
+                <img src="./images/P_010.jpg " alt="">
+            </div>
+        </div>
+        <div class="box">
+            <div class="pic">
+                <img src="./images/P_011.jpg " alt="">
+            </div>
+        </div>
+        <div class="box">
+            <div class="pic">
+                <img src="./images/P_012.jpg " alt="">
+            </div>
+        </div>
+        <div class="box">
+            <div class="pic">
+                <img src="./images/P_013.jpg " alt="">
+            </div>
+        </div>
+        <div class="box">
+            <div class="pic">
+                <img src="./images/P_014.jpg " alt="">
+            </div>
+        </div>
+        <div class="box">
+            <div class="pic">
+                <img src="./images/P_015.jpg " alt="">
+            </div>
+        </div>
+        <div class="box">
+            <div class="pic">
+                <img src="./images/P_016.jpg " alt="">
+            </div>
+        </div>
+        <div class="box">
+            <div class="pic">
+                <img src="./images/P_017.jpg " alt="">
+            </div>
+        </div>
+        <div class="box">
+            <div class="pic">
+                <img src="./images/P_018.jpg " alt="">
+            </div>
+        </div>
+        <div class="box">
+            <div class="pic">
+                <img src="./images/P_019.jpg " alt="">
+            </div>
+        </div>
+    </div>
+    <script>
+        window.onload = function() {
+            waterfall("main", "box");
+            // 模拟后台数据
+            var dataInt = {
+                "data": [{
+                    "src": "P_00.jpg"
+                }, {
+                    "src": "P_01.jpg"
+                }, {
+                    "src": "P_02.jpg"
+                }, {
+                    "src": "P_03.jpg"
+                }, {
+                    "src": "P_04.jpg"
+                }, {
+                    "src": "P_05.jpg"
+                }, {
+                    "src": "P_06.jpg"
+                }, {
+                    "src": "P_07.jpg"
+                }]
+            }
+            window.onscroll = function() {
+                //符合加载条件时，加载数据块 
+                if (checkScrollSlide()) {
+                    var oParent = document.getElementById("main");
+                    // 将数据块渲染到当前页面的尾部
+                    for (var i = 0; i < dataInt.data.length; i++) {
+                        var oBox = document.createElement("div");
+                        oBox.className = "box";
+                        oParent.appendChild(oBox);
+                        var oPic = document.createElement("div");
+                        oPic.className = "pic";
+                        oBox.appendChild(oPic);
+                        var oImg = document.createElement("img");
+                        oImg.src = "./images/" + dataInt.data[i].src;
+                        oPic.appendChild(oImg);
+                        console.log(oBox);
+                    }
+                    waterfall("main", "box");
+
+                }
+            }
+        }
+
+        function waterfall(parent, box) {
+            //获取所有的区块
+            var oParent = document.getElementById(parent);
+            var oBoxs = getByClass(oParent, box);
+            console.log(oBoxs);
+            //获取每个区块的宽度
+            var oBoxW = oBoxs[0].offsetWidth;
+            console.log(oBoxW);
+            //根据页面宽度计算列数（注意取整） 
+            var cols = Math.floor(document.documentElement.clientWidth / oBoxW);
+            //设置main的宽度和对齐方式
+            oParent.style.cssText = "width:" + oBoxW * cols + "px;margin:0 auto;";
+            //定义数组储存每一列的高度
+            var hArr = [];
+            for (var i = 0; i < oBoxs.length; i++) {
+                // for (var i in oBoxs) {
+                if (i < cols) {
+                    hArr.push(oBoxs[i].offsetHeight);
+                } else {
+                    var minH = Math.min.apply(null, hArr);
+                    var index = getMinhIndex(hArr, minH);
+                    oBoxs[i].style.position = "absolute";
+                    oBoxs[i].style.top = minH + "px";
+                    // oBoxs[i].style.left = oBoxW * index + "px";
+                    oBoxs[i].style.left = oBoxs[index].offsetLeft + "px";
+                    //改变数组 
+                    hArr[index] += oBoxs[i].offsetHeight;
+                    console.log(hArr);
+                }
+            }
+            console.log(hArr);
+
+        }
+        //根据class获取元素
+        function getByClass(parent, clsName) {
+            // var boxArr = new Array(); //储存class为box的元素
+            // var oElements = parent.getElementsByTagName("*");
+            // for (var i = 0; i < oElements.length; i++) {
+            //     if (oElements[i].className == clsName) {
+            //         boxArr.push(oElements[i]);
+            //     }
+            // }
+            var boxArr = parent.getElementsByClassName(clsName);
+            return boxArr;
+        }
+        //获取最小值在数组中的索引
+        function getMinhIndex(arr, val) {
+            for (var i in arr) {
+                if (arr[i] === val) {
+                    return i;
+                }
+            }
+        }
+        /*
+        页面头部卷去的高度加上浏览器窗口可视区域的高度大于
+        最后一个数据块到页面顶部的距离加上自身高度的一半
+        */
+        // 检测是否具备加载数据块的条件
+        function checkScrollSlide() {
+            //获取所有的区块
+            var oParent = document.getElementById("main");
+            var oBoxs = getByClass(oParent, "box");
+            var lastBoxH = oBoxs[oBoxs.length - 1].offsetTop + Math.floor(oBoxs[oBoxs.length - 1].offsetHeight / 2);
+            var scrollTop = document.body.scrollTop || document.documentElement.scrollTop;
+            // console.log(scrollTop);
+            var height = document.body.clientHeight || document.documentElement.clientHeight;
+            return (lastBoxH < scrollTop + height)
+        }
+    </script>
+</body>
+
+</html>

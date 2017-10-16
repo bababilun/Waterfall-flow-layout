@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>jquery实现瀑布流</title>
+    <style>
+        * {
+            padding: 0;
+            margin: 0;
+        }
+        
+        #main {
+            position: relative;
+        }
+        
+        .box {
+            padding: 15px 0 0 15px;
+            float: left;
+        }
+        
+        .pic {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-shadow: 0 0 5px #ccc;
+        }
+        
+        .pic img {
+            width: 165px;
+            height: auto;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="main">
+        <div class="box">
+            <div class="pic">
+                <img src="./images/P_00.jpg " alt="">
+            </div>
+        </div>
+        <div class="box">
+            <div class="pic">
+                <img src="./images/P_01.jpg " alt="">
+            </div>
+        </div>
+        <div class="box">
+            <div class="pic">
+                <img src="./images/P_02.jpg " alt="">
+            </div>
+        </div>
+        <div class="box">
+            <div class="pic">
+                <img src="./images/P_03.jpg " alt="">
+            </div>
+        </div>
+        <div class="box">
+            <div class="pic">
+                <img src="./images/P_04.jpg " alt="">
+            </div>
+        </div>
+        <div class="box">
+            <div class="pic">
+                <img src="./images/P_05.jpg " alt="">
+            </div>
+        </div>
+        <div class="box">
+            <div class="pic">
+                <img src="./images/P_06.jpg " alt="">
+            </div>
+        </div>
+        <div class="box">
+            <div class="pic">
+                <img src="./images/P_07.jpg " alt="">
+            </div>
+        </div>
+        <div class="box">
+            <div class="pic">
+                <img src="./images/P_08.jpg " alt="">
+            </div>
+        </div>
+        <div class="box">
+            <div class="pic">
+                <img src="./images/P_09.jpg " alt="">
+            </div>
+        </div>
+        <div class="box">
+            <div class="pic">
+                <img src="./images/P_010.jpg " alt="">
+            </div>
+        </div>
+        <div class="box">
+            <div class="pic">
+                <img src="./images/P_011.jpg " alt="">
+            </div>
+        </div>
+        <div class="box">
+            <div class="pic">
+                <img src="./images/P_012.jpg " alt="">
+            </div>
+        </div>
+        <div class="box">
+            <div class="pic">
+                <img src="./images/P_013.jpg " alt="">
+            </div>
+        </div>
+        <div class="box">
+            <div class="pic">
+                <img src="./images/P_014.jpg " alt="">
+            </div>
+        </div>
+        <div class="box">
+            <div class="pic">
+                <img src="./images/P_015.jpg " alt="">
+            </div>
+        </div>
+        <div class="box">
+            <div class="pic">
+                <img src="./images/P_016.jpg " alt="">
+            </div>
+        </div>
+        <div class="box">
+            <div class="pic">
+                <img src="./images/P_017.jpg " alt="">
+            </div>
+        </div>
+        <div class="box">
+            <div class="pic">
+                <img src="./images/P_018.jpg " alt="">
+            </div>
+        </div>
+        <div class="box">
+            <div class="pic">
+                <img src="./images/P_019.jpg " alt="">
+            </div>
+        </div>
+    </div>
+    <script src="./js/jquery-1.8.3.min.js"></script>
+    <script>
+        // 模拟后台数据
+        var dataInt = {
+                "data": [{
+                    "src": "P_00.jpg"
+                }, {
+                    "src": "P_01.jpg"
+                }, {
+                    "src": "P_02.jpg"
+                }, {
+                    "src": "P_03.jpg"
+                }, {
+                    "src": "P_04.jpg"
+                }, {
+                    "src": "P_05.jpg"
+                }, {
+                    "src": "P_06.jpg"
+                }, {
+                    "src": "P_07.jpg"
+                }]
+            }
+            //入口函数 
+        $(window).on("load", function() {
+            waterfall();
+            $(window).on("scroll", function() {
+                if (checkScrollSlide()) {
+                    $.each(dataInt.data, function(key, value) {
+                        var oBox = $("<div></div>").addClass("box").appendTo($("#main"));
+                        var oPic = $("<div></div>").addClass("pic").appendTo(oBox);
+                        // $("<img>").attr("src", "./images/" + value.src).appendTo(oPic);
+                        $("<img>").attr("src", "./images/" + $(value).attr("src")).appendTo(oPic);
+                    })
+
+                }
+                waterfall();
+            })
+        })
+
+        function waterfall() {
+            var $boxs = $("#main>div");
+            //数据块宽度 
+            var w = $boxs.eq(0).outerWidth();
+            //列数 
+            var cols = Math.floor($(window).width() / w);
+            $("#main").width(w * cols).css("margin", "0 auto");
+            var hArr = [];
+            $boxs.each(function(index, value) {
+
+                var h = $(value).outerHeight();
+                console.log(h);
+                if (index < cols) {
+                    hArr[index] = h;
+                } else {
+                    var minH = Math.min.apply(null, hArr);
+                    var minHIndex = $.inArray(minH, hArr);
+                    $(value).css({
+                        "position": "absolute",
+                        "top": minH + "px",
+                        "left": minHIndex * w + "px"
+                    })
+                    hArr[minHIndex] += $boxs.eq(index).outerHeight();
+                }
+            })
+        }
+        //边界检测 
+        function checkScrollSlide() {
+            var $lastBox = $("#main>div").last();
+            var lastBoxDis = $lastBox.offset().top + Math.floor($lastBox.outerHeight() / 2);
+            var scrollTop = $(window).scrollTop();
+            var documentH = $(window).height();
+            return (lastBoxDis < scrollTop + documentH ? true : false);
+        }
+    </script>
+</body>
+
+</html>
